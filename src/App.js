@@ -10,7 +10,7 @@ const Box = (props) => {
 
 const NewGame = (props) => {
   return (
-    <button disabled> Reset Game </button>
+    <button disabled={props.disabledStatus} onClick={props.newGameHandler}> Reset Game </button>
   )
 }
 
@@ -18,6 +18,9 @@ const App = () => {
   const [toggle, settoggle] = useState(false);
   const [count, setcount] = useState(0);
   const [boardState, setboardState] = useState(Array(9).fill(null));
+  const [reset, setreset] = useState(true);
+  const [flag, setflag] = useState(true);
+  let resetProp = true;
 
   function calculateWinner(boardState) {
     const lines = [
@@ -41,16 +44,17 @@ const App = () => {
 
   const handleClick = (i) => {
     const boardStateCopy = boardState.slice();
+
     if (boardState[i] || calculateWinner(boardState)) {
       return;
     } else if (toggle === false) {
       boardStateCopy[i] = "X";
       setcount(count + 1);
-      settoggle(true)
+      settoggle(true);
     } else {
       boardStateCopy[i] = "O";
       setcount(count + 1);
-      settoggle(false)
+      settoggle(false);
     }
     setboardState(boardStateCopy);
   }
@@ -59,32 +63,40 @@ const App = () => {
   let status;
   if (winner) {
     status = 'Winner: ' + winner;
+    resetProp = false;
   } else if (count > 8) {
     status = 'Tie, No Winner'
+    resetProp = false;
   } else {
     status = 'Next player: ' + (toggle ? 'O' : 'X');
+  }
+
+  if (!resetProp && flag) {
+    resetProp = true;
+    setflag(false);
+    setreset(!resetProp);
   }
 
   return (
     <div className="center">
       <div className="status">{status}</div>
-      <div>
+      <div style={{height: "34px"}}>
         <Box stringName={boardState[0]} handler={() => {handleClick(0)}}/>
         <Box stringName={boardState[1]} handler={() => {handleClick(1)}}/>
         <Box stringName={boardState[2]} handler={() => {handleClick(2)}}/>
       </div>
-      <div>
+      <div style={{height: "34px"}}>
         <Box stringName={boardState[3]} handler={() => {handleClick(3)}}/>
         <Box stringName={boardState[4]} handler={() => {handleClick(4)}}/>
         <Box stringName={boardState[5]} handler={() => {handleClick(5)}}/>
       </div>
-      <div>
+      <div style={{height: "34px"}}>
         <Box stringName={boardState[6]} handler={() => {handleClick(6)}}/>
         <Box stringName={boardState[7]} handler={() => {handleClick(7)}}/>
         <Box stringName={boardState[8]} handler={() => {handleClick(8)}}/>
       </div>
       <div>
-        <NewGame/>
+        <NewGame disabledStatus={reset} newGameHandler={() => window.location.reload(true)}/>
       </div>
     </div>
   )
